@@ -9,12 +9,12 @@ const router = Router();
 router.post('/signup', async (req, res) => {
     const { name, email, password } = req.body;
     try {
-        if (!name || !email || !password){
+        if(!name || !email || !password){
             throw new Error(`All fields are required`);
         }
 
         const user = await User.findOne({email});
-        if (user){
+        if(user){
             throw new Error (`User already exists`);
         }
 
@@ -55,7 +55,7 @@ router.post('/login', async (req, res) => {
         res.status(200).json({user: payload, token});
 
     } catch (error) {
-        res.status(500).json({message: `Sorry, Please try again!`, error})
+        res.status(500).json({message: `Sorry, Please try logging again!`, error})
     }
 });
 
