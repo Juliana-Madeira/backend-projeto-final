@@ -18,17 +18,17 @@ router.post('/signup', async (req, res) => {
         }
 
         const salt = bcrypt.genSaltSync(12);
-        const passwordHash = await bcrypt.hash(password, salt);
+        const hash = await bcrypt.hash(password, salt);
 
         const newUser = await User.create({
             name,
             email,
-            passwordHash
+            passwordHash: hash
         })
-        res.status(201).json(`User created!`);
+        res.status(201).json(`User Created!`);
 
     } catch (error) {
-        res.status(500).json({message: `Sorry, Please try again!`, error})
+        res.status(500).json({message: `Sorry, Please try again!`, error: error.message})
         }
 });
 
@@ -54,7 +54,7 @@ router.post('/login', async (req, res) => {
         res.status(200).json({user: payload, token});
 
     } catch (error) {
-        res.status(500).json({message: `Sorry, Please try logging again!`, error})
+        res.status(500).json({message: `Sorry, Please try logging again!`, error:error.message})
     }
 });
 

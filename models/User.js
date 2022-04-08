@@ -14,8 +14,13 @@ const userSchema = new Schema({
     passwordHash: {
         type: String,
         required:true
-    }
-}, {timestamps: true}
+    },
+    // cartId: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'Cart'
+    // }
+}, 
+    {timestamps: true}
 );
 
 module.exports = model('User', userSchema);

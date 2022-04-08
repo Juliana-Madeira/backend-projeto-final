@@ -12,7 +12,7 @@ const authorization = (req, res, next) => {
         next();
 
     } catch (error) {
-        res.status(401).json({message: `Unauthorized`, error})
+        res.status(401).json({msg: `Unauthorized`, error: error.message})
     }
 };
 
