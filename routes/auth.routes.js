@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs/dist/bcrypt');
 const { Router } = require('express');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
