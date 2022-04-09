@@ -14,7 +14,8 @@ const userSchema = new Schema({
     passwordHash: {
         type: String,
         required:true
-    }
+    },
+    my_favorites: {type: Schema.Types.ObjectId, ref:'MyFavorites'}
 }, 
     {timestamps: true}
 );
