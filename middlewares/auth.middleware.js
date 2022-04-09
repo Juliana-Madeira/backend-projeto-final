@@ -16,24 +16,5 @@ const authorization = (req, res, next) => {
     }
 };
 
-const tokenAndAuthorization = (req, res, next) => {
-    authorization (req, res, () => {
-        if(req.user.id === req.params.id || req.user.isAdmin) {
-            next();
-        } else {
-            res.status(403).json("You are not aloewd to do that!");
-        }
-    }) 
-}
 
-const tokenAndAdmin = (req, res, next) => {
-    authorization (req, res, () => {
-        if(req.user.isAdmin){
-            next();
-        } else {
-            res.status(403).json("You are not aloewd to do that!");
-        }
-    })
-}
-
-module.exports = {authorization, tokenAndAuthorization, tokenAndAdmin};
+module.exports = authorization;

@@ -14,11 +14,7 @@ const userSchema = new Schema({
     passwordHash: {
         type: String,
         required:true
-    },
-    // cartId: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'Cart'
-    // }
+    }
 }, 
     {timestamps: true}
 );
