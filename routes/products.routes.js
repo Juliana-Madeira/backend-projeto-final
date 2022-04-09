@@ -1,8 +1,5 @@
 const { Router } = require('express');
 const Product = require('../models/Product');
-const { authorization, 
-    tokenAndAuthorization, 
-    tokenAndAdmin} = require('../middlewares/auth.middleware');
 
 const router = Router();
 
@@ -27,16 +24,16 @@ router.get('/:productId', async (req, res) => {
     }
 });
 
-router.post('/', tokenAndAdmin, async (req, res) => {
+router.post('/',async (req, res) => {
     try {
-    //     const newProduct = await Product.create({...req.body, productId: id});
-    //     res.status(201).json(newProduct);
+        const newProduct = await Product.create({...req.body, productId: id});
+        res.status(201).json(newProduct);
     } catch (error) {
         res.status(500).json({message: "Could not create a new product", error});
     }
 });
 
-router.put('/:productId', tokenAndAdmin, async (req, res) => {
+router.put('/:productId', async (req, res) => {
     const { productId } = req.params;
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
@@ -50,7 +47,7 @@ router.put('/:productId', tokenAndAdmin, async (req, res) => {
     }
 });
 
-router.delete('/:productId', tokenAndAdmin, async (req, res) => {
+router.delete('/:productId', async (req, res) => {
     const { productId } = req.params;
     try {
         await Product.findByIdAndDelete(productId);

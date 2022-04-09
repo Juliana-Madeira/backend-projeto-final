@@ -27,7 +27,13 @@ const productSchema = new Schema({
     },
     olfactoryPyramid: {
         type: String
-    }
-})
+    },
+    inStock: {
+        type: Boolean,
+        default: true
+    },
+},
+    {timestamps: true}
+);
 
 module.exports = model('Product', productSchema);
