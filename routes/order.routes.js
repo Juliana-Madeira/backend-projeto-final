@@ -10,7 +10,7 @@ router.get('/order', async(req,res) => {
 
     try{
         const order = await Order.findOne({userId: id}).populate({path:'products', populate: { path: 'productId'}})
-        res.status(200).json(order);
+        res.status(200).json({order});
     } catch(err){
         res.status(500).json(err);
     }
@@ -48,7 +48,7 @@ router.post("/order/:productId", async(req, res) => {
             }
             const createProductinCart = await Cart.create(payload);
             const updateProductinCart = await Order.findByIdAndUpdate( order._id, {$push: {products : createProductinCart._id}},{new: true})
-            res.status(201).json(updateProductinCart)
+            res.status(201).json({updateProductinCart})
         }
 
     }
@@ -59,49 +59,93 @@ router.post("/order/:productId", async(req, res) => {
 
 //EDITAR < - PARAMOS AQUI
 
-//Carrinho do usuário
-router.get('/:cartId', async(req,res) =>{
-    const {cartId} = req.params;
-    try{
-        const cartList = await Order.findById(cartId)
-        res.status(200).json( cartList);
-    }catch (err){
-        res.status(500).json({ error: error.message });  
-    }
-})
-
-//Update
-router.put('/:cartId', async(req, res) => {
-    const {cartId} = req.params;
+router.put('/order/:productId', async(req, res) => {
+    const {orderId} = req.params;
     const payload = req.body;
     const userId = req.user.id;
     try{
-        const updatedCart = await Order.findByIdAndUpdate({_id: cartId, user: userId}, payload ,{new: true})
-        if(!updatedCart){
-            throw new Error('Cannot update cart from another user')
+        const order = await Order.find(userId)
+        const updatedOrder = await Order.findByIdAndUpdate({_id: orderId, user: userId}, payload ,{new: true})
+        if(!updatedOrder){
+            throw new Error('Cannot update the Order from another user')
         }
-        res.status(200).json(updatedCart);
+        res.status(200).json({updatedOrder});
     } catch (err) {
         res.status(500).json({ error: error.message });  
     }
 })
 
-//Delete
-router.delete('/:cartId', async(req, res) => {
-    const {cartId} = req.params;
-    const userId = req.user.id;
-    try{
-        const deleteCart = await Order.delete(cartId);
-        if (deleteCart.user.toString() !== userId){
-            throw new Error('cannot delete another user cart')
-        }
-        deleteCart.delete()
-        res.status(204).json();
-
-    } catch (err) {
-        res.status(500).json({ error: error.message }); 
+//Alterar Status do Order Fechado
+router.put('/order-fechado', async (req, res) => {
+    const { id } = req.user;
+    try {
+        const order = await Order.findOneAndUpdate({ user_id: id}, { status: 'fechado' }, { new: true });
+        res.status(200).json({ order });
+    } catch (error) {
+        res.status(500).json(error);
     }
-})
+});
+
+//Order Status Pago
+router.put('/order-pago', async (req, res) => {
+    const { id } = req.user;
+    try {
+        const order = await Order.findOneAndUpdate({ user_id: id}, { status: 'pago' }, { new: true });
+        res.status(200).json({ order });
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
+//deletar um produto do Order
+router.delete('/order/:productId', async (req, res) => {
+    const { productId } = req.params;
+    const { id } = req.user
+
+    try {
+        
+        const order = await Order.findOne({ user_id: id });
+        const productOrder = await Cart.findOne({ cartId: order._id, productId });
+        await Order.findByIdAndUpdate(order._id, { $pull: { products:  productOrder._id }  }, { new: true } );
+
+        await Cart.findOneAndDelete({ cartId: order._id, productId });
+        res.status(200).json();
+    } catch(error) {
+        res.status(500).json({ message: 'Error deleting product in the Order', error});
+    }
+});
+
+
+//limpar Cart(remover todos os produtos)
+router.delete('/clean-order', async (req, res) => {
+    const { userId } = req.user;
+    
+    try {
+        const order = await Order.findOne({ userId });
+        //deletar todos do Cart
+        await Cart.deleteMany({ cartId: order._id });
+
+        //deletar dentro de Cart
+        await Cart.findByIdAndUpdate(order._id, { $set: { products: [] }});
+        res.status(200).json();
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
+//remover entire Order
+router.delete('/order-delete', async(req, res) => {
+    const { id } = req.user;
+
+    try {
+        await Cart.deleteMany({ userId: id });
+
+        await Order.findOneAndDelete({ userId: id });
+        res.status(200).json({ message: 'Order succesfully deleted' });    
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
 
 
 module.exports = router;
