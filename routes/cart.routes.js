@@ -1,67 +1,49 @@
 const { Router } = require('express');
-const Order = require('../models/Order');
 const User = require('../models/User');
-//const auth = require('./auth.routes');
-
+const Order = require('../models/Order')
 const router = Router();
 
-//Create
-router.post("/", async(req, res) => {
-    const newCart = new Order(req.body);
-    const userId= req.user.id
-    try{
-        const createCart = {...newCart, user: userId}
-        const cart = await Cart.creat(createCart);
-        await User.findByIdAndUpdate( userId, {$push: {cartId: cart._id}})
-        res.status(200).json(savedCart);
-    } catch (err){
-        res.status(500).json(err);
-    }
-})
+//get Cart
+router.get('/cart', async (req, res) => {
+    const { id } = req.user;
+     try {
+        const order = await Order.findOne({userId: id});
+        const cart = await Cart.find({ cartId: order._id }).populate('productId');
+        res.status(200).json(cart);
+     } catch (error) {
+         res.status(500).json(error);
+     }
+});
 
-//Carrinho do usuário
-router.get('/:cartId', async(req,res) =>{
-    const {cartId} = req.params;
-    try{
-        const cartList = await Order.findById(cartId)
-        res.status(200).json( cartList);
-    }catch (err){
-        res.status(500).json({ error: error.message });  
-    }
-})
 
-//Update
-router.put('/:cartId', async(req, res) => {
-    const {cartId} = req.params;
-    const payload = req.body;
-    const userId = req.user.id;
-    try{
-        const updatedCart = await Order.findByIdAndUpdate({_id: cartId, user: userId}, payload ,{new: true})
-        if(!updatedCart){
-            throw new Error('Cannot update cart from another user')
-        }
-        res.status(200).json(updatedCart);
-    } catch (err) {
-        res.status(500).json({ error: error.message });  
+//get one Product do user logado
+router.get('/cart/:productId', async (req, res) => {
+    const { productId } = req.params;
+    try {
+        const product = await Cart.find({ productId }).populate('productId');
+        res.status(200).json(product)
+    } catch (error) {
+        res.status(500).json(error)
     }
-})
+});
 
-//Delete
-router.delete('/:cartId', async(req, res) => {
-    const {cartId} = req.params;
-    const userId = req.user.id;
-    try{
-        const deleteCart = await Order.delete(cartId);
-        if (deleteCart.user.toString() !== userId){
-            throw new Error('cannot delete another user cart')
-        }
-        deleteCart.delete()
-        res.status(204).json();
 
-    } catch (err) {
-        res.status(500).json({ error: error.message }); 
+//deletar todos os productos do cart
+router.delete('/cart/all', async (req, res) => {
+    const { id } = req.user;
+
+    try {
+        //perar o Order id
+        const order = await Order.findOne({ userId: id });
+        //para deletar
+        await Cart.deleteMany({ cartId: order._id});
+
+        res.status(200).json();
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting all products in Cart', error});
     }
-})
+});
+
 
 
 module.exports = router;
