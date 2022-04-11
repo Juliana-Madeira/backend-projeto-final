@@ -11,8 +11,8 @@ router.get('/order', async(req,res) => {
     try{
         const order = await Order.findOne({userId: id}).populate({path:'products', populate: { path: 'productId'}})
         res.status(200).json({order});
-    } catch(err){
-        res.status(500).json(err);
+    } catch(error){
+        res.status(500).json({message: `Sorry! You don't have orders`, error});
     }
 })
 
@@ -52,12 +52,11 @@ router.post("/order/:productId", async(req, res) => {
         }
 
     }
-   } catch(err){
-    res.status(500).json(err);
+   } catch(error){
+    res.status(500).json({message: `Could not create the order, please try again!`,error});
    }
 })
 
-//EDITAR < - PARAMOS AQUI
 
 router.put('/order/:productId', async(req, res) => {
     const {orderId} = req.params;
@@ -67,33 +66,33 @@ router.put('/order/:productId', async(req, res) => {
         const order = await Order.find(userId)
         const updatedOrder = await Order.findByIdAndUpdate({_id: orderId, user: userId}, payload ,{new: true})
         if(!updatedOrder){
-            throw new Error('Cannot update the Order from another user')
+            throw new Error('Cannot update the order from another user')
         }
         res.status(200).json({updatedOrder});
-    } catch (err) {
-        res.status(500).json({ error: error.message });  
+    } catch (error) {
+        res.status(500).json({message: `Update failed`, error});  
     }
 })
 
 //Alterar Status do Order Fechado
-router.put('/order-fechado', async (req, res) => {
+router.put('/placed-order', async (req, res) => {
     const { id } = req.user;
     try {
-        const order = await Order.findOneAndUpdate({ user_id: id}, { status: 'fechado' }, { new: true });
+        const order = await Order.findOneAndUpdate({ user_id: id}, { status: 'placed' }, { new: true });
         res.status(200).json({ order });
     } catch (error) {
-        res.status(500).json(error);
+        res.status(500).json({message: `Could not update to placed order`, error});
     }
 });
 
 //Order Status Pago
-router.put('/order-pago', async (req, res) => {
+router.put('/paid-order', async (req, res) => {
     const { id } = req.user;
     try {
-        const order = await Order.findOneAndUpdate({ user_id: id}, { status: 'pago' }, { new: true });
+        const order = await Order.findOneAndUpdate({ user_id: id}, { status: 'paid' }, { new: true });
         res.status(200).json({ order });
     } catch (error) {
-        res.status(500).json(error);
+        res.status(500).json({message: `Could not update to paid order`, error});
     }
 });
 
@@ -129,12 +128,12 @@ router.delete('/clean-order', async (req, res) => {
         await Cart.findByIdAndUpdate(order._id, { $set: { products: [] }});
         res.status(200).json();
     } catch (error) {
-        res.status(500).json(error);
+        res.status(500).json({message: `Could not delete the products in the cart`, error});
     }
 });
 
 //remover entire Order
-router.delete('/order-delete', async(req, res) => {
+router.delete('/delete-order', async(req, res) => {
     const { id } = req.user;
 
     try {
@@ -143,7 +142,7 @@ router.delete('/order-delete', async(req, res) => {
         await Order.findOneAndDelete({ userId: id });
         res.status(200).json({ message: 'Order succesfully deleted' });    
     } catch (error) {
-        res.status(500).json(error);
+        res.status(500).json({message: `Could not delete the order`, error});
     }
 });
 

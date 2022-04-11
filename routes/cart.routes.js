@@ -1,6 +1,8 @@
 const { Router } = require('express');
 const User = require('../models/User');
-const Order = require('../models/Order')
+const Order = require('../models/Order');
+const Cart = require('../models/Cart');
+
 const router = Router();
 
 //get Cart
@@ -11,7 +13,7 @@ router.get('/cart', async (req, res) => {
         const cart = await Cart.find({ cartId: order._id }).populate('productId');
         res.status(200).json(cart);
      } catch (error) {
-         res.status(500).json(error);
+         res.status(500).json({message: `You don't have any cart`, error});
      }
 });
 
@@ -23,7 +25,7 @@ router.get('/cart/:productId', async (req, res) => {
         const product = await Cart.find({ productId }).populate('productId');
         res.status(200).json(product)
     } catch (error) {
-        res.status(500).json(error)
+        res.status(500).json({message: `You don't have any cart`, error})
     }
 });
 
@@ -33,7 +35,7 @@ router.delete('/cart/all', async (req, res) => {
     const { id } = req.user;
 
     try {
-        //perar o Order id
+        //pegar o Order id
         const order = await Order.findOne({ userId: id });
         //para deletar
         await Cart.deleteMany({ cartId: order._id});

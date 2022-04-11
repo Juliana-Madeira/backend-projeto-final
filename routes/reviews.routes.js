@@ -52,7 +52,7 @@ router.delete('/review/:reviewId', async(req, res) => {
         res.status(200).json({ message:'review deleted'});
 
     } catch (error) {
-        res.status(500).json({ message: 'Error trying to delete a review'});
+        res.status(500).json({ message: 'Error trying to delete a review', error});
     }
 });
 

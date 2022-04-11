@@ -11,11 +11,11 @@ const orderSchema = new Schema({
     status: { 
         type: String,
         enum: [
-            'order opened',
-            'order placed',
-            'order paid',
-            'order canceled'],
-        default: 'open order'
+            'opened',
+            'placed',
+            'paid',
+            'canceled'],
+        default: 'opened'
     }
 },  
     {timestamps: true}
