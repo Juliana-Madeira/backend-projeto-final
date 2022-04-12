@@ -15,7 +15,9 @@ const userSchema = new Schema({
         type: String,
         required:true
     },
-    my_favorites: {type: Schema.Types.ObjectId, ref:'MyFavorites'}
+    my_favorites: {
+        type: Schema.Types.ObjectId,
+        ref:'MyFavorites'}
 }, 
     {timestamps: true}
 );

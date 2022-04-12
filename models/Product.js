@@ -32,7 +32,9 @@ const productSchema = new Schema({
         type: Boolean,
         default: true
     },
-    reviews: [{type: Schema.Types.ObjectId, ref: 'Review'}]
+    reviews: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Review'}]
 },
     {timestamps: true}
 );

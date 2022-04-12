@@ -10,7 +10,7 @@ router.put('/:userId', async (req, res) => {
             {new: true});
         res.status(200).json(updateUser);
     } catch (error) {
-        res.status(500).json(err);
+        res.status(500).json({message: `Update failed`, error});
     }
 });
 
@@ -21,7 +21,7 @@ router.delete('/:userId', async (req, res) => {
         await User.findByIdAndDelete(userId);
         res.status(200).json("User deleted!");
     } catch (error) {
-        res.status(500).json(err);     
+        res.status(500).json({message: `Unable to delete your username`, error});     
     }
 });
 

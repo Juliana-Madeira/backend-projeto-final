@@ -12,7 +12,7 @@ router.get('/myFavotires', async(req, res) => {
         const list = await MyFavorites.findOne({ userId: id }).populate('products');
         res.status(200).json(list);
     } catch(error) {
-        res.status(500).json(error);
+        res.status(500).json({message: `You don't have favorite products`, error});
     }
 })
 
@@ -27,7 +27,7 @@ router.post('/myFavotires/:productId', async(req, res) => {
         const findId = list.products.includes(productId);
         
         if(findId){
-            res.status(400).json({ message: 'product already added in your list'});
+            res.status(400).json({ message: 'Product already added in your list'});
             return;
         }
         if(!list) {
@@ -39,7 +39,7 @@ router.post('/myFavotires/:productId', async(req, res) => {
             res.status(201).json(updatedList);
         } else {
             await MyFavotires.findOneAndUpdate(list._id, { $push: { products: productId } }, { new: true });
-            res.status(200).json({message: 'product added to your list'})
+            res.status(200).json({message: 'Product added to your list'})
         }
     } catch(error) {
         res.status(500).json(error);
@@ -79,7 +79,7 @@ router.post('/myFavotires-order/:productId', async(req, res) => {
             res.status(201).json(updateOrder);
         }
     } catch(error) {
-        res.status(500).json({ message: 'Error while moving product to cart', error })
+        res.status(500).json({ message: 'Error while moving product to cart, please try again!', error })
     }
 });
 
@@ -91,7 +91,7 @@ router.delete('/myFavorites/:productId', async(req, res)=> {
         await MyFavotires.findOneAndUpdate({userId: id}, { $pull: { products: productId } }, { new: true })
         res.status(200).json();
     } catch(error) {
-        res.status(500).json(error);
+        res.status(500).json({message: `Unable to delete product from favorites`, error});
     };
 });
 
