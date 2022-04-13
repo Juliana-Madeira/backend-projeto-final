@@ -5,7 +5,7 @@ const Product = require('../models/Product');
 const router = Router();
 
 //creat review
-router.post('/review/:productId', async(req, res) => {
+router.post('/:productId', async(req, res) => {
     const { productId } = req.params;
     const { id } = req.user;
     const { review } = req.body;
@@ -24,7 +24,7 @@ router.post('/review/:productId', async(req, res) => {
 
 
 //update review
-router.put('/review/:reviewId', async (req, res) => {
+router.put('/:reviewId', async (req, res) => {
     const { id } = req.user;
     const { reviewId } = req.params
 
@@ -38,7 +38,7 @@ router.put('/review/:reviewId', async (req, res) => {
 
 
 //delete one review
-router.delete('/review/:reviewId', async(req, res) => {
+router.delete('/:reviewId', async(req, res) => {
     const { reviewId } = req.params;
     const { id } = req.user;
     try {
