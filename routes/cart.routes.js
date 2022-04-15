@@ -22,7 +22,6 @@ router.get("/", async (req, res) => {
 //Create
 router.post("/:productId", async (req, res) => {
   const { productId } = req.params;
-  const { quantity } = req.body;
   const userId = req.user.id;
 
   try {
@@ -35,7 +34,6 @@ router.post("/:productId", async (req, res) => {
       const payload = {
         productId,
         cartId: newCart._id,
-        quantity,
       };
 
       const createCart = await CartProduct.create(payload);
@@ -80,19 +78,24 @@ router.post("/:productId", async (req, res) => {
   }
 });
 
-router.put("/:orderId", async (req, res) => {
+//update
+router.put("/update/:cartId", async (req, res) => {
   const { cartId } = req.params;
   const payload = req.body;
   const userId = req.user.id;
+  
   try {
     const cart = await Cart.find({ userId });
+    if(!cart){
+      return res.status(404).json({ message: "Cart not found", error }); 
+    }
     const updatedCart = await Cart.findByIdAndUpdate(
       { _id: cartId, user: userId },
       payload,
       { new: true }
     );
     if (!updatedCart) {
-      throw new Error("Cannot update the order from another user");
+      throw new Error("Cannot update the cart from another user");
     }
     res.status(200).json({ updatedCart });
   } catch (error) {
@@ -105,7 +108,7 @@ router.put("/placed-order", async (req, res) => {
   const { id } = req.user;
   try {
     const cart = await Cart.findOneAndUpdate(
-      { userId: id },
+      { userId: id, status:"opened" },
       { status: "placed" },
       { new: true }
     );
@@ -125,7 +128,7 @@ router.put("/paid-order", async (req, res) => {
   const { id } = req.user;
   try {
     const cart = await Cart.findOneAndUpdate(
-      { user_id: id },
+      { user_id: id, status: "placed" },
       { status: "paid" },
       { new: true }
     );
@@ -136,7 +139,7 @@ router.put("/paid-order", async (req, res) => {
 });
 
 //deletar um produto do cart
-router.delete("/:productId", async (req, res) => {
+router.delete("/remove/:productId", async (req, res) => {
   const { productId } = req.params;
   const { id } = req.user;
 
@@ -162,18 +165,18 @@ router.delete("/:productId", async (req, res) => {
     res
       .status(500)
       .json({
-        message: "Error deleting product in the Order",
+        message: "Error deleting product in the Cart",
         error: error.message,
       });
   }
 });
 
 //limpar Cart(remover todos os produtos)
-router.delete("/clean-cart", async (req, res) => {
-  const { userId } = req.user;
+router.delete("/clean-cart/:cartId", async (req, res) => {
+  const {cartId} = req.params;
 
   try {
-    const cart = await Cart.findOne({ userId });
+    const cart = await Cart.findOne({ _id: cartId });
     //deletar todos do Cart
     await CartProduct.deleteMany({ cartId: cart._id });
 
@@ -187,14 +190,15 @@ router.delete("/clean-cart", async (req, res) => {
   }
 });
 
-//remover entire Order
-router.delete("/delete-cart", async (req, res) => {
-  const { id } = req.user;
+//remover entire Cart
+router.delete("/delete-cart/:cartId", async (req, res) => {
+  const {cartId} = req.params;
+
 
   try {
-    await CartProduct.deleteMany({ userId: id });
+    await CartProduct.deleteMany({ cartId });
 
-    await Cart.findOneAndDelete({ userId: id });
+    await Cart.findByIdAndDelete( cartId );
     res.status(200).json({ message: "Order succesfully deleted" });
   } catch (error) {
     res.status(500).json({ message: `Could not delete the order`, error });
