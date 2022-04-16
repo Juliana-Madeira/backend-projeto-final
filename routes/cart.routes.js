@@ -4,7 +4,8 @@ const CartProduct = require("../models/CartProduct");
 
 const router = Router();
 
-// Get all Orders
+//get all - pegar todos os carrinhos do usuário
+//rota ok
 router.get("/", async (req, res) => {
   const { id } = req.user;
 
@@ -15,11 +16,12 @@ router.get("/", async (req, res) => {
     });
     res.status(200).json({ cart });
   } catch (error) {
-    res.status(500).json({ message: `Sorry! You don't have orders`, error });
+    res.status(500).json({ message: `Sorry! You don't have any carts`, error });
   }
 });
 
-//Create
+//Post Create - Criar um carrinho novo - verificando se ja tem um aberto
+//rota ok
 router.post("/:productId", async (req, res) => {
   const { productId } = req.params;
   const userId = req.user.id;
@@ -72,13 +74,14 @@ router.post("/:productId", async (req, res) => {
     res
       .status(500)
       .json({
-        message: `Could not create the order, please try again!`,
+        message: `Could not create the cart, please try again!`,
         error: error.message,
       });
   }
 });
 
-//update
+//update - atualizar o carrinho
+//rota ok
 router.put("/update/:cartId", async (req, res) => {
   const { cartId } = req.params;
   const payload = req.body;
@@ -99,11 +102,14 @@ router.put("/update/:cartId", async (req, res) => {
     }
     res.status(200).json({ updatedCart });
   } catch (error) {
-    res.status(500).json({ message: `Update failed 00`, error });
+    res.status(500).json({ message: `Update failed`, error });
   }
 });
 
-//Alterar Status do Order Fechado (Rota não está funcionando)
+
+
+//Alterar Status do Order Fechado
+//rota ok
 router.put("/placed-order", async (req, res) => {
   const { id } = req.user;
   try {
@@ -123,7 +129,8 @@ router.put("/placed-order", async (req, res) => {
   }
 });
 
-//Order Status Pago (Rota não está funcionando)
+//Order Status Pago
+//rota ok
 router.put("/paid-order", async (req, res) => {
   const { id } = req.user;
   try {
@@ -138,10 +145,11 @@ router.put("/paid-order", async (req, res) => {
   }
 });
 
-//deletar um produto do cart
+//deletar um produto do cart  (ROTA NAO ESTA FUNCIONANDO)
 router.delete("/remove/:productId", async (req, res) => {
   const { productId } = req.params;
   const { id } = req.user;
+  
 
   console.log(productId, id);
 
@@ -171,14 +179,14 @@ router.delete("/remove/:productId", async (req, res) => {
   }
 });
 
-//limpar Cart(remover todos os produtos)
+//limpar Cart(remover todos os produtos)     (ROTA NAO ESTA FUNCIONANDO)
 router.delete("/clean-cart/:cartId", async (req, res) => {
   const {cartId} = req.params;
 
   try {
     const cart = await Cart.findOne({ _id: cartId });
-    //deletar todos do Cart
-    await CartProduct.deleteMany({ cartId: cart._id });
+    // //deletar todos do Cart
+    // await CartProduct.findByIdAndDelete({cartId});
 
     //deletar dentro de Cart
     await CartProduct.findByIdAndUpdate(cart._id, { $set: { products: [] } });
@@ -191,6 +199,7 @@ router.delete("/clean-cart/:cartId", async (req, res) => {
 });
 
 //remover entire Cart
+//rota ok
 router.delete("/delete-cart/:cartId", async (req, res) => {
   const {cartId} = req.params;
 
