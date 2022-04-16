@@ -49,9 +49,13 @@ router.delete('/all', async (req, res) => {
 router.post('/add-product/:productId', async(req, res) => {
   const { productId } = req.params;
   const userId = req.user.id;
+  console.log(productId, userId)
   try{
   const cart = await Cart.findOne({ userId, status:"opened" });
-  const productInCart = await CartProduct.findOne({productId, cartId:cart._id });
+  const cartId = cart._id
+  console.log(cart, cartId)
+  const productInCart = await CartProduct.findOne({productId, cartId});
+  console.log(productInCart)
   if (productInCart) {
     const newQuantity = productInCart.quantity + 1;
     const updateProducts = await CartProduct.findByIdAndUpdate(
@@ -63,6 +67,7 @@ router.post('/add-product/:productId', async(req, res) => {
     const payload = {
       productId,
       quantity,
+      cartId
     };
     const createProductinCart = await CartProduct.create(payload);
     const updateProductinCart = await Cart.findByIdAndUpdate(
@@ -87,13 +92,17 @@ res
 // add quantity of the product in the cart
 router.put("/add-quantity-of-product/:productId", async (req, res) => {
   const { productId } = req.params;
-  const { userId } = req.user;
+  const userId = req.user.id;
+  console.log(productId, userId)
   try {
     const cart = await Cart.findOne({ userId, status:"opened" });
+    const cartId = cart._id;
     if (!cart){
       return res.status(404).json({ message: "Cart not found", error }); 
     } 
-      const newQuantity = productInCart.quantity + 1;
+    const productInCart = await CartProduct.findOne({cartId});
+    console.log(productInCart)
+    const newQuantity = productInCart.quantity + 1;
     const cartUpdate = await CartProduct.findOneAndUpdate(
       { productId },
       { quantity: newQuantity },
@@ -102,7 +111,7 @@ router.put("/add-quantity-of-product/:productId", async (req, res) => {
     res.status(200).json({ cartUpdate });
     
   } catch (error) {
-    res.status(500).json({ message: `Could not update the quantity of the product`, error });
+    res.status(500).json({ message: `Could not update the quantity of the product`, error: error.message });
   }
 });
 
