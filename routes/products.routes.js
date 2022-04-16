@@ -3,6 +3,7 @@ const Product = require("../models/Product");
 
 const router = Router();
 
+//rota ok
 router.get("/", async (req, res) => {
   try {
     const allProducts = await Product.find();
@@ -12,6 +13,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+//rota ok
 router.get("/:productId", async (req, res) => {
   const { productId } = req.params;
   try {
@@ -22,6 +24,7 @@ router.get("/:productId", async (req, res) => {
   }
 });
 
+//rota ok
 router.post("/", async (req, res) => {
   try {
     const newProduct = await Product.create({ ...req.body });
@@ -31,6 +34,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+//rota ok
 router.put("/:productId", async (req, res) => {
   const { productId } = req.params;
   const payload = req.body;
@@ -48,6 +52,7 @@ router.put("/:productId", async (req, res) => {
   }
 });
 
+//rota ok
 router.delete("/:productId", async (req, res) => {
   const { productId } = req.params;
   try {

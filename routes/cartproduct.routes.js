@@ -4,7 +4,7 @@ const CartProduct = require("../models/CartProduct");
 
 const router = Router();
 
-//get Cart
+//get Cart    (ROTA VOLTANDO PRODUCT ID NULL)
 router.get('/cart-product', async (req, res) => {
     const { id } = req.user;
      try {
@@ -17,11 +17,11 @@ router.get('/cart-product', async (req, res) => {
 });
 
 
-//get one Product do user logado
+//get one Product do user logado   (ROTA VOLTANDO ARRAY VAZIO)
 router.get('/cart-product/:productId', async (req, res) => {
     const { productId } = req.params;
     try {
-        const product = await CartProduct.find({ productId }).populate('productId');
+        const product = await CartProduct.find({productId}).populate('productId');
         res.status(200).json(product)
     } catch (error) {
         res.status(500).json({message: `You don't have any cart`, error})
@@ -29,21 +29,21 @@ router.get('/cart-product/:productId', async (req, res) => {
 });
 
 
-//deletar todos os productos do cart
-router.delete('/all', async (req, res) => {
-    const { id } = req.user;
+// //deletar todos os productos do cart    (ROTA JA TEM NO CART ROUTES CLEAN CART NAO FUNCIONANDO)
+// router.delete('/all', async (req, res) => {
+//     const { id } = req.user;
 
-    try {
-        //pegar o Order id
-        const cart = await Cart.findOne({ userId: id });
-        //para deletar
-        await CartProduct.deleteMany({ cartId: cart._id});
+//     try {
+//         //pegar o Order id
+//         const cart = await Cart.findOne({ userId: id });
+//         //para deletar
+//         await CartProduct.deleteMany({ cartId: cart._id});
 
-        res.status(200).json();
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting all products in Cart', error});
-    }
-});
+//         res.status(200).json();
+//     } catch (error) {
+//         res.status(500).json({ message: 'Error deleting all products in Cart', error});
+//     }
+// });
 
 // add products in the cart
 router.post('/add-product/:productId', async(req, res) => {
