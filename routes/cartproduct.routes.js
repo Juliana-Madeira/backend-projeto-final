@@ -4,7 +4,7 @@ const CartProduct = require("../models/CartProduct");
 
 const router = Router();
 
-//get Cart    (ROTA VOLTANDO PRODUCT ID NULL)
+//get Cart
 router.get('/cart-product', async (req, res) => {
     const { id } = req.user;
      try {
@@ -54,9 +54,9 @@ router.post('/add-product/:productId', async(req, res) => {
   const cart = await Cart.findOne({ userId, status:"opened" });
   const cartId = cart._id
   console.log(cart, cartId)
-  const productInCart = await CartProduct.findOne({productId, cartId});
+  const productInCart = await CartProduct.findOne({ productId, cartId });
   console.log(productInCart)
-  if (productInCart) {
+  if (productInCart != null) {
     const newQuantity = productInCart.quantity + 1;
     const updateProducts = await CartProduct.findByIdAndUpdate(
       productInCart._id,
@@ -66,7 +66,6 @@ router.post('/add-product/:productId', async(req, res) => {
   } else {
     const payload = {
       productId,
-      quantity,
       cartId
     };
     const createProductinCart = await CartProduct.create(payload);
@@ -93,19 +92,20 @@ res
 router.put("/add-quantity-of-product/:productId", async (req, res) => {
   const { productId } = req.params;
   const userId = req.user.id;
-  console.log(productId, userId)
+  const payload = req.body;
+  console.log(productId, userId, payload)
   try {
     const cart = await Cart.findOne({ userId, status:"opened" });
     const cartId = cart._id;
+
+    console.log(cartId)
     if (!cart){
       return res.status(404).json({ message: "Cart not found", error }); 
     } 
-    const productInCart = await CartProduct.findOne({cartId});
-    console.log(productInCart)
-    const newQuantity = productInCart.quantity + 1;
+ 
     const cartUpdate = await CartProduct.findOneAndUpdate(
-      { productId },
-      { quantity: newQuantity },
+      { cartId, productId },
+      payload ,
       { new: true }
     );
     res.status(200).json({ cartUpdate });
@@ -115,26 +115,6 @@ router.put("/add-quantity-of-product/:productId", async (req, res) => {
   }
 });
 
-// take out quantity of the product in the cart
-router.put("/take-out-quantity-of-product/:productId", async (req, res) => {
-  const { productId } = req.params;
-  const { userId } = req.user;
-  try {
-    const cart = await Cart.findOne({ userId, status:"opened" });
-    if (!cart){
-      return res.status(404).json({ message: "Cart not found", error }); 
-    } 
-      const newQuantity = productInCart.quantity - 1;
-    const cartUpdate = await CartProduct.findOneAndUpdate(
-      { productId },
-      { quantity: newQuantity },
-      { new: true }
-    );
-    res.status(200).json({ cartUpdate });
-    
-  } catch (error) {
-    res.status(500).json({ message: `Could not update the quantity of the product`, error });
-  }
-});
+
 
 module.exports = router;

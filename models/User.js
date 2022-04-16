@@ -15,7 +15,7 @@ const userSchema = new Schema({
         type: String,
         required:true
     },
-    my_favorites: {
+    myFavorites: {
         type: Schema.Types.ObjectId,
         ref:'MyFavorites'}
 }, 
