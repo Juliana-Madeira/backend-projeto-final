@@ -13,9 +13,19 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
-    img: {
+    img1: {
         type: String,
         required: true
+    },
+    img2: {
+        type: String,
+        required: true
+    },
+    img3: {
+        type: String,
+    },
+    img4: {
+        type: String,
     },
     size: {
         type: String,
