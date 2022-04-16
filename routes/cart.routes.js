@@ -92,6 +92,8 @@ router.put("/update/:cartId", async (req, res) => {
     if(!cart){
       return res.status(404).json({ message: "Cart not found", error }); 
     }
+    
+    
     const updatedCart = await Cart.findByIdAndUpdate(
       { _id: cartId, user: userId },
       payload,
@@ -100,6 +102,7 @@ router.put("/update/:cartId", async (req, res) => {
     if (!updatedCart) {
       throw new Error("Cannot update the cart from another user");
     }
+
     res.status(200).json({ updatedCart });
   } catch (error) {
     res.status(500).json({ message: `Update failed`, error });
@@ -145,7 +148,7 @@ router.put("/paid-order", async (req, res) => {
   }
 });
 
-//deletar um produto do cart  (ROTA NAO ESTA FUNCIONANDO)
+//deletar um produto do cart 
 router.delete("/remove/:productId", async (req, res) => {
   const { productId } = req.params;
   const { id } = req.user;
@@ -179,17 +182,19 @@ router.delete("/remove/:productId", async (req, res) => {
   }
 });
 
-//limpar Cart(remover todos os produtos)     (ROTA NAO ESTA FUNCIONANDO)
+//limpar Cart(remover todos os produtos)
 router.delete("/clean-cart/:cartId", async (req, res) => {
   const {cartId} = req.params;
+  const { id } = req.user;
 
   try {
-    const cart = await Cart.findOne({ _id: cartId });
-    // //deletar todos do Cart
-    // await CartProduct.findByIdAndDelete({cartId});
+    const cart = await Cart.findOne({ userId: id, status: "opened"});
+    console.log(cart)
+    // //deletar todos do CartProduct
+    await CartProduct.deleteMany({cartId});
 
     //deletar dentro de Cart
-    await CartProduct.findByIdAndUpdate(cart._id, { $set: { products: [] } });
+    await Cart.findByIdAndUpdate(cart._id, { $set: { products: [] } });
     res.status(200).json();
   } catch (error) {
     res
@@ -208,7 +213,7 @@ router.delete("/delete-cart/:cartId", async (req, res) => {
     await CartProduct.deleteMany({ cartId });
 
     await Cart.findByIdAndDelete( cartId );
-    res.status(200).json({ message: "Order succesfully deleted" });
+    res.status(200).json({ message: "Cart succesfully deleted" });
   } catch (error) {
     res.status(500).json({ message: `Could not delete the order`, error });
   }

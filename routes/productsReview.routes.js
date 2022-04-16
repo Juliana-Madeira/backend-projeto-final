@@ -4,7 +4,7 @@ const Review = require('../models/Review');
 const router = Router();
 
 //get all reviews of one product
-router.get('/review/:productId', async(req, res) => {
+router.get('/:productId', async(req, res) => {
     const { productId } = req.params;
 
     try {

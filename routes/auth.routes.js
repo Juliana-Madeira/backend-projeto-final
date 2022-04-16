@@ -2,6 +2,7 @@ const { Router } = require('express');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const MyFavorites = require('../models/MyFavorites');
 
 const router = Router();
 
@@ -25,6 +26,8 @@ router.post('/signup', async (req, res) => {
             email,
             passwordHash: hash
         })
+        const favorite = newUser._id;
+        await MyFavorites.create({userId: favorite})
         res.status(201).json(`User Created!`);
 
     } catch (error) {
