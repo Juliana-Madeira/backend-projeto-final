@@ -42,6 +42,9 @@ const productSchema = new Schema({
         type: Boolean,
         default: true
     },
+    category:{
+        type: String
+    },
     reviews: [{
         type: Schema.Types.ObjectId,
         ref: 'Review'}]
