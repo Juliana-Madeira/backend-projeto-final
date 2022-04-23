@@ -6,6 +6,7 @@ const User = require("../models/User");
 
 const router = Router();
 
+//get
 router.get("/", async (req, res) => {
   const { id } = req.user;
   try {
@@ -38,7 +39,7 @@ router.post("/add/:productId", async (req, res) => {
     }
 
     const updatedList = await MyFavorites.findOneAndUpdate(
-      userId,
+      {userId},
       { $push: { products: productId } },
       { new: true }
     );
