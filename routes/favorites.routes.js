@@ -103,7 +103,7 @@ router.post("/add-delete/:productId", async (req, res) => {
   }
 });
 
-router.delete("/:productId", async (req, res) => {
+router.delete("/delete/:productId", async (req, res) => {
   const { productId } = req.params;
   const { id } = req.user;
 
