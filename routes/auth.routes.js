@@ -62,4 +62,17 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get('/logout', async(req, res) => {
+    const token = req.headers.token;
+    try{
+        if(token){
+        res.header("token", null, {httpOnly:true})   //ou res.cookie? 
+        }
+    } catch (error) {
+        res.status(401).send('Logout not authorizated!')
+    }
+    res.send("Success Logout!")
+})
+
+
 module.exports = router;
