@@ -28,10 +28,12 @@ router.post("/:productId", async (req, res) => {
 
   try {
     const cart = await Cart.findOne({ userId });
-    console.log("oi");
+    console.log("oi!");
 
     if (!cart) {
+      
       const newCart = await Cart.create({ userId });
+      
 
       const payload = {
         productId,
@@ -47,6 +49,7 @@ router.post("/:productId", async (req, res) => {
       );
       res.status(201).json(updateCart);
     } else {
+      console.log('estou aqui 1 else')
       const productInCart = await CartProduct.findOne({productId, cartId:cart._id});
       if (productInCart) {
         const newQuantity = productInCart.quantity + 1;
@@ -56,10 +59,10 @@ router.post("/:productId", async (req, res) => {
         );
         res.status(200).json({ message: "Quantity updated." });
       } else {
+        console.log('estou aqui 2 else')
         const payload = {
           productId,
-          cartId: newCart._id,
-          quantity,
+          cartId: cart._id
         };
         const createProductinCart = await CartProduct.create(payload);
         const updateProductinCart = await Cart.findByIdAndUpdate(

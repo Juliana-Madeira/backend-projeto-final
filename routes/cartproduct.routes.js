@@ -92,11 +92,12 @@ res
 router.put("/add-quantity-of-product/:productId", async (req, res) => {
   const { productId } = req.params;
   const userId = req.user.id;
-  const payload = req.body;
-  console.log(productId, userId, payload)
+  const {quantity} = req.body;
+  console.log(productId, userId, quantity)
   try {
     const cart = await Cart.findOne({ userId, status:"opened" });
     const cartId = cart._id;
+    
 
     console.log(cartId)
     if (!cart){
@@ -105,7 +106,7 @@ router.put("/add-quantity-of-product/:productId", async (req, res) => {
  
     const cartUpdate = await CartProduct.findOneAndUpdate(
       { cartId, productId },
-      payload ,
+      {quantity} ,
       { new: true }
     );
     res.status(200).json({ cartUpdate });
